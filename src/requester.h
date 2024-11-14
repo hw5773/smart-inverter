@@ -6,7 +6,6 @@
 #include <time.h>
 #include <resolv.h>
 #include <netdb.h>
-#include <pthread.h>
 #include <errno.h>
 #include <limits.h>
 #include <getopt.h>
@@ -22,79 +21,35 @@
 #include <openssl/err.h>
 #include "errors.h"
 
-#include <dpi/debug.h>
-#include <dpi/defines.h>
-#include <simple_http/simple_https.h>
-
-#define DEFAULT_DOMAIN_NAME "www.mt-dpi.com"
-#define DEFAULT_PORT_NUMBER 5556
-
-typedef struct arg_st
-{
-  const char *domain;
-  int port;
-  const char *content;
-  int mtdpi;
-  int blindbox;
-  int resumption;
-  
-  SSL_CTX *ctx;
-} arg_t;
-
-void *run(void *data);
-SSL_CTX* init_client_ctx(void);
-void load_ecdh_params(SSL_CTX *ctx);
-unsigned long get_current_time(void);
-unsigned long get_current_cpu(void);
-
-int http_make_request(uint8_t *domain, uint32_t dlen, uint8_t *content,
-		uint32_t clen, uint8_t *msg, uint32_t *mlen);
-int http_parse_response(uint8_t *msg, uint32_t mlen);
+#include <smart/debug.h>
+#include <smart/types.h>
 
 int usage(const char *pname)
 {
   emsg(">> Usage: %s [options]", pname);
   emsg("Options");
-  emsg("  -d, --domain      Server Domain Name");
-  emsg("  -p, --port        Server Port Number");
-  emsg("  -c, --content     Request Content Name (default: index.html)");
-  emsg("  -r, --resumption  Enable Session Resumption");
-  emsg("  -m, --mtdpi       Enable MT-DPI");
-  emsg("  -b, --blindbox    Enable Blindbox");
+  emsg("  -c, --code      Function Code");
   exit(1);
 }
 
 int dtype;
 int main(int argc, char *argv[])
 {   
-  const char *pname, *domain, *content, *opt;
-	int c, rc, port, mtdpi, blindbox, resumption;
-  SSL_CTX *ctx;
-  arg_t *arg;
+  const char *pname, *opt;
+	int c, rc, code;
 
-  dtype = DPI_DEBUG_CLIENT|DPI_DEBUG_LIBRARY;
+  dtype = DPI_DEBUG_REQUESTER|DPI_DEBUG_LIBRARY;
   pname = argv[0];
-  domain = DEFAULT_DOMAIN_NAME;
-  content = NULL;
-  port = DEFAULT_PORT_NUMBER;
-  resumption = 0;
-  mtdpi = 0;
-  blindbox = 0;
 
   while (1)
   {
     int opt_idx = 0;
     static struct option long_options[] = {
-      {"domain", required_argument, 0, 'd'},
-      {"port", required_argument, 0, 'p'},
-      {"content", required_argument, 0, 'c'},
-      {"resumption", no_argument, 0, 'r'},
-      {"mtdpi", no_argument, 0, 'm'},
-      {"blindbox", no_argument, 0, 'b'},
+      {"code", required_argument, 0, 'c'},
       {0, 0, 0, 0}
     };
 
-    opt = "d:p:c:rmb0";
+    opt = "c:0";
 
     c = getopt_long(argc, argv, opt, long_options, &opt_idx);
 
@@ -103,25 +58,13 @@ int main(int argc, char *argv[])
 
     switch (c)
     {
-      case 'd':
-        domain = optarg;
-        break;
-      case 'p':
-        port = atoi(optarg);
-        break;
       case 'c':
-        content = optarg;
+        code = atoi(optarg);
+        rc = check_code(code);
+        if (rc < 0)
+          usage(pname);
         break;
-      case 'r':
-        resumption = 1;
-        break;
-      case 'm':
-        mtdpi = 1;
-        break;
-      case 'b':
-        blindbox = 1;
-        break;
-      default:
+     default:
         usage(pname);
     }
   }
