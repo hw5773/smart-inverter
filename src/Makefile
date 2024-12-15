@@ -10,14 +10,14 @@ SHARED ?= 0
 ROOT_DIRECTORY=$(PWD)/..
 BIN=requester inverter
 
-SRCS=check.c
+SRCS=check.c common.c
 OBJS=$(SRCS:.c=.o)
-REQUESTER_SRC=requester.c
+REQUESTER_SRC=requester.c requester_func.c
 REQUESTER_OBJ=$(REQUESTER_SRC:.c=.o)
-INVERTER_SRC=inverter.c
+INVERTER_SRC=inverter.c inverter_func.c
 INVERTER_OBJ=$(INVERTER_SRC:.c=.o)
 
-CFLAGS=-Wall -I. -I$(ROOT_DIRECTORY)/include -DDEBUG_LEVEL=$(DEBUG_LEVEL)
+CFLAGS=-Wall -I$(ROOT_DIRECTORY)/include -I. -DDEBUG_LEVEL=$(DEBUG_LEVEL)
 LDFLAGS=-L$(ROOT_DIRECTORY)/lib 
 
 all: requester inverter

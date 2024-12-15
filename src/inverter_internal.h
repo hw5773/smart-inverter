@@ -1,6 +1,8 @@
 #ifndef __INVERTER_INTERNAL_H__
 #define __INVERTER_INTERNAL_H__
 
+#include <stdint.h>
+
 #include <smart/inverter.h>
 #include <smart/defines.h>
 

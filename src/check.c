@@ -1,5 +1,13 @@
 #include "check.h"
 
+int check_serial(const char *serial)
+{
+  int ret;
+  ret = 1;
+
+  return ret;
+}
+
 int check_code(int code)
 {
   int ret;

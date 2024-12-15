@@ -5,6 +5,8 @@
 
 inverter_t *init_inverter(const char *serial);
 void free_inverter(inverter_t *inverter);
+void set_inverter_id(inverter_t *inverter, int id);
+void set_inverter_baud_rate(inverter_t *inverter, int baud_rate);
 
 int receive_request(inverter_t *inverter);
 int send_response(inverter_t *inverter);

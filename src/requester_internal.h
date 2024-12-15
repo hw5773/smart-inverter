@@ -1,6 +1,8 @@
 #ifndef __REQUESTER_INTERNAL_H__
 #define __REQUESTER_INTERNAL_H__
 
+#include <stdint.h>
+
 #include <smart/requester.h>
 #include <smart/defines.h>
 

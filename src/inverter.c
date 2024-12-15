@@ -35,7 +35,7 @@ int dtype;
 int main(int argc, char *argv[])
 {   
   const char *pname, *serial, *opt;
-	int c, rc;
+	int c, rc, ret;
   int id, len, baud_rate;
   inverter_t *inverter;
 
@@ -94,15 +94,30 @@ int main(int argc, char *argv[])
   imsg(SMART_DEBUG_INVERTER, "Communication at %s with %d baud rate", serial, baud_rate);
 
   inverter = init_inverter(serial);
+  if (!inverter)
+  {
+    emsg("The inverter is not set");
+    goto err;
+  }
+
+  set_inverter_id(inverter, id);
+  set_inverter_baud_rate(inverter, baud_rate);
 
   while (1)
   {
     len = receive_request(inverter);
     if (len > 0)
-      send_response(inverter);
+    {
+      ret = send_response(inverter);
+
+      switch (ret)
+      {
+        default:
+          emsg("No log message");
+      }
+    }
   }
 
+err:
 	return 0;
 }
-
-
