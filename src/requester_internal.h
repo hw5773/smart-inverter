@@ -7,7 +7,8 @@
 #include <smart/defines.h>
 
 struct requester_st {
-  int id;
+  uint8_t mid;
+  uint8_t pid;
   int fd;
   uint8_t buf[MAX_BUF_LEN];
 };

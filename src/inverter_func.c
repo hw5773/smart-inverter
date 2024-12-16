@@ -77,3 +77,32 @@ void set_inverter_baud_rate(inverter_t *inverter, int baud_rate)
 err:
   ffinish();
 }
+
+int receive_request(inverter_t *inverter)
+{
+  assert(inverter != NULL);
+  fstart("inverter: %p", inverter);
+  int rcvd;
+  rcvd = read(inverter->fd, &(inverter->buf), MAX_BUF_LEN);
+  iprint(SMART_DEBUG_INVERTER, "request message", (inverter->buf), 0, rcvd, 16);
+  imsg(SMART_DEBUG_INVERTER, "received %d bytes at %d", rcvd, inverter->fd);
+
+  ffinish("rcvd: %d", rcvd);
+  return rcvd;
+}
+
+int send_response(inverter_t *inverter)
+{
+  assert(inverter != NULL);
+  fstart("inverter: %p", inverter);
+  int sent, len;
+  uint8_t *p;
+
+  p = inverter->buf;
+
+  len = p - inverter->buf;
+  sent = write(inverter->fd, inverter->buf, len);
+
+  ffinish("sent: %d", sent);
+  return sent;
+}

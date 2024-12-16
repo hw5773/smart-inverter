@@ -90,6 +90,24 @@ int main(int argc, char *argv[])
     }
   }
 
+  if (id < 0)
+  {
+    emsg("The inverter's ID is not set");
+    goto err;
+  }
+
+  if (!serial)
+  {
+    emsg("The serial port is not set");
+    goto err;
+  }
+
+  if (baud_rate < 0)
+  {
+    emsg("The baud rate is not set");
+    goto err;
+  }
+
   imsg(SMART_DEBUG_INVERTER, "Start the inverter application (ID: %d)", id);
   imsg(SMART_DEBUG_INVERTER, "Communication at %s with %d baud rate", serial, baud_rate);
 
