@@ -149,9 +149,9 @@ int main(int argc, char *argv[])
     if (curr > prev + interval)
     {
       len = send_request(requester);
-      sleep(0.5);
       if (len > 0)
       {
+        sleep(0.5);
         len = receive_response(requester);
         if (len > 0)
           loop += 1;

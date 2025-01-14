@@ -81,8 +81,10 @@ void set_requester_baud_rate(requester_t *requester, int baud_rate)
     goto err;
   }
 
-  cfsetispeed(&tty, baud_rate);
-  cfsetospeed(&tty, baud_rate);
+  //cfsetispeed(&tty, baud_rate);
+  //cfsetospeed(&tty, baud_rate);
+  cfsetispeed(&tty, B9600);
+  cfsetospeed(&tty, B9600);
 
   if (tcsetattr(requester->fd, TCSANOW, &tty))
   {
@@ -125,6 +127,8 @@ int receive_response(requester_t *requester)
   fstart("requester: %p", requester);
   int rcvd;
   rcvd = read(requester->fd, &(requester->buf), MAX_BUF_LEN);
+  iprint(SMART_DEBUG_REQUESTER, "response message", (requester->buf), 0, rcvd, 16);
+  imsg(SMART_DEBUG_REQUESTER, "received %d bytes at %d", rcvd, requester->fd);
 
   ffinish("rcvd: %d", rcvd);
   return rcvd;

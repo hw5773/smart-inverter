@@ -65,8 +65,10 @@ void set_inverter_baud_rate(inverter_t *inverter, int baud_rate)
     goto err;
   }
 
-  cfsetispeed(&tty, baud_rate);
-  cfsetospeed(&tty, baud_rate);
+  //cfsetispeed(&tty, baud_rate);
+  //cfsetospeed(&tty, baud_rate);
+  cfsetispeed(&tty, B9600);
+  cfsetospeed(&tty, B9600);
 
   if (tcsetattr(inverter->fd, TCSANOW, &tty))
   {
@@ -99,6 +101,8 @@ int send_response(inverter_t *inverter)
   uint8_t *p;
 
   p = inverter->buf;
+  *(p++) = 0x01;
+  *(p++) = 0x03;
 
   len = p - inverter->buf;
   sent = write(inverter->fd, inverter->buf, len);
