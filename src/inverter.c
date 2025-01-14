@@ -20,6 +20,7 @@
 #include <smart/inverter.h>
 #include "inverter_internal.h"
 #include "check.h"
+#include "command.h"
 
 int usage(const char *pname)
 {
@@ -35,7 +36,7 @@ int dtype;
 int main(int argc, char *argv[])
 {   
   const char *pname, *serial, *opt;
-	int c, rc, cmd;
+	int c, i, n, rc, cmd;
   int id, len, baud_rate;
   inverter_t *inverter;
 
@@ -141,7 +142,17 @@ int main(int argc, char *argv[])
     len = receive_request(inverter);
     if (len > 0)
     {
-      send_response(inverter, cmd);
+      if (cmd == SMART_COMMAND_FLOODING)
+      {
+        n = 100;
+      }
+      else
+      {
+        n = 1;
+      }
+
+      for (i=0; i<n; i++)
+        send_response(inverter, cmd);
     }
   }
 

@@ -70,6 +70,7 @@ int check_command(int cmd)
     case SMART_COMMAND_NORMAL:
     case SMART_COMMAND_INVALID_CRC:
     case SMART_COMMAND_INVALID_VAL:
+    case SMART_COMMAND_FLOODING:
       break;
 
     default:

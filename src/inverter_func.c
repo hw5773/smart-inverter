@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include <smart/debug.h>
 #include <smart/inverter.h>
@@ -27,6 +28,7 @@ inverter_t *init_inverter(const char *serial)
   ret->fd = open_serial_port(serial);
   if (ret->fd < 0) goto err;
 
+  srand(time(NULL));
 err:
   ffinish("ret: %p", ret);
   return ret;
@@ -132,6 +134,7 @@ int send_response(inverter_t *inverter, int cmd)
   assert(inverter != NULL);
   fstart("inverter: %p", inverter);
   int sent, len, v;
+  double pr;
   uint8_t *p;
 
   p = inverter->buf;
@@ -192,10 +195,28 @@ int send_response(inverter_t *inverter, int cmd)
   *(p++) = 0x00;
   *(p++) = 0x22;
 
+  // crc
+  *(p++) = 0x00;
+  *(p++) = 0x00;
+
   len = p - inverter->buf;
-  len += 2;
   if (cmd == SMART_COMMAND_NORMAL)
+  {
+    pr = 1;
+  }
+  else
+  {
+    pr = rand();
+    pr /= RAND_MAX;
+  }
+
+  imsg(SMART_DEBUG_INVERTER, "Probability: %lf", pr);
+  if (pr > 0.3)
+  {
+    imsg(SMART_DEBUG_INVERTER, "crc inserted");
     insert_checksum(inverter->buf, len);
+  }
+
   sent = write(inverter->fd, inverter->buf, len);
   iprint(SMART_DEBUG_INVERTER, "response message", (inverter->buf), 0, sent, 16);
   imsg(SMART_DEBUG_INVERTER, "sent %d bytes at %d", sent, inverter->fd);
