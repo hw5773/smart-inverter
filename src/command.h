@@ -1,0 +1,9 @@
+#ifndef __COMMAND_H__
+#define __COMMAND_H__
+
+#define SMART_COMMAND_NORMAL      0
+#define SMART_COMMAND_INVALID_CRC 1
+#define SMART_COMMAND_INVALID_VAL 2
+#define SMART_COMMAND_FLOODING    3
+
+#endif /* __COMMAND_H__ */

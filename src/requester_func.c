@@ -81,10 +81,27 @@ void set_requester_baud_rate(requester_t *requester, int baud_rate)
     goto err;
   }
 
-  //cfsetispeed(&tty, baud_rate);
-  //cfsetospeed(&tty, baud_rate);
-  cfsetispeed(&tty, B9600);
-  cfsetospeed(&tty, B9600);
+  switch (baud_rate)
+  {
+    case 9600:
+      cfsetispeed(&tty, B9600);
+      cfsetospeed(&tty, B9600);
+      break;
+
+    case 38400:
+      cfsetispeed(&tty, B38400);
+      cfsetospeed(&tty, B38400);
+      break;
+
+    case 115200:
+      cfsetispeed(&tty, B115200);
+      cfsetospeed(&tty, B115200);
+      break;
+
+    default:
+      cfsetispeed(&tty, B115200);
+      cfsetospeed(&tty, B115200);
+  }
 
   if (tcsetattr(requester->fd, TCSANOW, &tty))
   {
@@ -127,8 +144,22 @@ int receive_response(requester_t *requester)
   fstart("requester: %p", requester);
   int rcvd;
   rcvd = read(requester->fd, &(requester->buf), MAX_BUF_LEN);
-  iprint(SMART_DEBUG_REQUESTER, "response message", (requester->buf), 0, rcvd, 16);
-  imsg(SMART_DEBUG_REQUESTER, "received %d bytes at %d", rcvd, requester->fd);
+
+  if (rcvd > 0)
+  {
+    iprint(SMART_DEBUG_REQUESTER, "response message", (requester->buf), 0, rcvd, 16);
+    imsg(SMART_DEBUG_REQUESTER, "received %d bytes at %d", rcvd, requester->fd);
+
+    if (verify_checksum(requester->buf, rcvd))
+    {
+      imsg(SMART_DEBUG_REQUESTER, "No checksum error");
+    }
+    else
+    {
+      emsg("Checksum error");
+      rcvd = -1;
+    }
+  }
 
   ffinish("rcvd: %d", rcvd);
   return rcvd;

@@ -35,7 +35,7 @@ int dtype;
 int main(int argc, char *argv[])
 {   
   const char *pname, *serial, *opt;
-	int c, rc, ret;
+	int c, rc, cmd;
   int id, len, baud_rate;
   inverter_t *inverter;
 
@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
   serial = NULL;
   id = -1;
   baud_rate = -1;
+  cmd = 0;
 
   while (1)
   {
@@ -52,10 +53,11 @@ int main(int argc, char *argv[])
       {"baudrate", required_argument, 0, 'b'},
       {"serial", required_argument, 0, 's'},
       {"id", required_argument, 0, 'i'},
+      {"command", required_argument, 0, 'c'},
       {0, 0, 0, 0}
     };
 
-    opt = "s:d:i:0";
+    opt = "b:s:i:c:0";
 
     c = getopt_long(argc, argv, opt, long_options, &opt_idx);
 
@@ -85,6 +87,13 @@ int main(int argc, char *argv[])
           usage(pname);
         break;
 
+      case 'c':
+        cmd = atoi(optarg);
+        rc = check_command(cmd);
+        if (rc < 0)
+          usage(pname);
+        break;
+
       default:
         usage(pname);
     }
@@ -93,6 +102,12 @@ int main(int argc, char *argv[])
   if (id < 0)
   {
     emsg("The inverter's ID is not set");
+    goto err;
+  }
+
+  if (cmd < 0)
+  {
+    emsg("The command is incorrect");
     goto err;
   }
 
@@ -126,13 +141,7 @@ int main(int argc, char *argv[])
     len = receive_request(inverter);
     if (len > 0)
     {
-      ret = send_response(inverter);
-
-      switch (ret)
-      {
-        default:
-          emsg("No log message");
-      }
+      send_response(inverter, cmd);
     }
   }
 

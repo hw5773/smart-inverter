@@ -5,6 +5,7 @@
 
 #include "ptype.h"
 #include "check.h"
+#include "command.h"
 
 int check_serial(const char *serial)
 {
@@ -60,6 +61,22 @@ int check_id(int id)
   ret = 1;
 
   return ret;
+}
+
+int check_command(int cmd)
+{
+  switch (cmd)
+  {
+    case SMART_COMMAND_NORMAL:
+    case SMART_COMMAND_INVALID_CRC:
+    case SMART_COMMAND_INVALID_VAL:
+      break;
+
+    default:
+      cmd = -1;
+  }
+
+  return cmd;
 }
 
 // Table of CRC values for high-order byte
